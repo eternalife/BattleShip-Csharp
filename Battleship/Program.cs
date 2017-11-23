@@ -7,7 +7,6 @@ namespace Battleship
         static void Main(string[] args)
         {
             MainMenu();
-            
         }
         public const int IN_HALF = 2;
         public const int BOARD_WIDTH = 10;
@@ -21,9 +20,9 @@ namespace Battleship
         public enum Ships
         {
             Destroyer = 2,
-            BattleShip = 3,
-            Cruser = 4,
-            Submarine = 4,
+            Submarine = 3,
+            Cruiser = 3,
+            BattleShip = 4,
             Carrier = 5
         };
         public enum Actions
@@ -72,16 +71,16 @@ namespace Battleship
             switch (input)
             {
                 case "1":
-                    Console.WriteLine("You selected Choice #1");
+                    Console.WriteLine("You selected option #1");
                     break;
                 case "2":
-                    Console.WriteLine("You selected Choice #2");
+                    Console.WriteLine("You selected option #2");
                     break;
                 case "3":
-                    Console.WriteLine("You selected Choice #3");
+                    Console.WriteLine("You selected option #3");
                     break;
                 case "4":
-                    Console.WriteLine("You selected Choice #4");
+                    Console.WriteLine("You selected option #4");
                     Console.ReadKey();
                     Tests t = new Tests();
                     break;
@@ -128,7 +127,62 @@ namespace Battleship
                     }
                     break;
                 case Actions.SetPiece:
-                    board[x + y * BOARD_HEIGHT] = '+';
+                    bool setpiece = true;
+                    switch (orientation)
+                    {
+                        case Orientation.Horizontal:
+                            if (x + (int)ship < BOARD_WIDTH && y < BOARD_HEIGHT)
+                            {
+                                for (int i = 0; i < (int)ship; ++i)
+                                {
+                                    if (board[(x + i) + y * BOARD_HEIGHT] == '+')
+                                    {
+                                        setpiece = false;
+                                        Console.Write("Sorry can't set it there.\n");
+                                        Console.ReadKey();
+                                    }
+                                }
+                                if (setpiece)
+                                {
+                                    for (int i = 0; i < (int)ship; ++i)
+                                    {
+                                        board[(x + i) + y * BOARD_HEIGHT] = '+';
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.Write("Sorry can't set it there.\n");
+                                Console.ReadKey();
+                            }
+                            break;
+                        case Orientation.Vertical:
+                            if (y + (int)ship < BOARD_HEIGHT && x < BOARD_WIDTH)
+                            {
+                                for (int i = 0; i < (int)ship; ++i)
+                                {
+                                    if (board[x + (y + i) * BOARD_HEIGHT] == '+')
+                                    {
+                                        setpiece = false;
+                                        Console.Write("Sorry can't set it there.\n");
+                                        Console.ReadKey();
+                                    }
+                                }
+                                if (setpiece)
+                                {
+                                    for (int i = 0; i < (int)ship; ++i)
+                                    {
+                                        board[x + (y + i) * BOARD_HEIGHT] = '+';
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.Write("Sorry can't set it there.\n");
+                                Console.ReadKey();
+                            }
+                            break;
+                    }
                     break;
                 case Actions.SetPeg:
                     board[x + y * BOARD_HEIGHT] = peg;
