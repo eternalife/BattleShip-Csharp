@@ -6,26 +6,14 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
-            Board(Actions.Initialize, gameBoard);
-            Board(Actions.Show, gameBoard);
-            Board(Actions.SetPeg, gameBoard, 5, 5,'o');
-            Board(Actions.SetPeg, gameBoard, 4, 6, 'x');
-            Board(Actions.SetPiece, gameBoard, 3, 2, orientation:Orientation.Vertical, ship:Ships.Carrier);
-            Board(Actions.Show, gameBoard);
-            for(int i = 0; i < 255; ++i)
-            {
-                Console.Write(i + " " + (char)i);
-            }
-
-            Console.ReadKey();
+            MainMenu();
+            
         }
         public const int IN_HALF = 2;
         public const int BOARD_WIDTH = 10;
         public const int BOARD_HEIGHT = 10;
         public const int BOARD_SIZE = 100;
         public const int BOARD_EMPTY_SYMBOLE = 4;
-        public const int CONSOLE_WIDTH = 120;
-        public const int CONSOLE_HEIGHT = 30;
         public static char[] gameBoard = new char[BOARD_SIZE];
         //x = Hit peg
         //o = Miss Peg
@@ -50,6 +38,63 @@ namespace Battleship
             Horizontal,
             Vertical
         };
+        public static void MainMenu()
+        {
+            string input = null;
+            bool exit = false;
+            do
+            {
+                Console.Clear();
+                if (input != null)
+                {
+                    Console.WriteLine("Sorry that option doesn't exist.");
+                }
+                else
+                {
+                    Console.Write("\n");
+                }
+                
+                Console.WriteLine("Please select from the following options:");
+                Console.WriteLine("1: Play against Mathematical AI");
+                Console.WriteLine("2: Play against Deep Neural Network AI");
+                Console.WriteLine("3: Play against another player");
+                Console.WriteLine("4: Run all test cases");
+                Console.WriteLine("5: Exit Game");
+                input = Console.ReadLine();
+            } while (
+            input.CompareTo("1") != 0 &&
+            input.CompareTo("2") != 0 &&
+            input.CompareTo("3") != 0 &&
+            input.CompareTo("4") != 0 &&
+            input.CompareTo("5") != 0
+            );
+
+            switch (input)
+            {
+                case "1":
+                    Console.WriteLine("You selected Choice #1");
+                    break;
+                case "2":
+                    Console.WriteLine("You selected Choice #2");
+                    break;
+                case "3":
+                    Console.WriteLine("You selected Choice #3");
+                    break;
+                case "4":
+                    Console.WriteLine("You selected Choice #4");
+                    Console.ReadKey();
+                    Tests t = new Tests();
+                    break;
+                case "5":
+                    exit = true;
+                    break;
+            }
+            if(!exit)
+            {
+                Console.ReadKey();
+                MainMenu();
+            }
+        }
         public static void Board(Actions action, char[] board, int x = 0, int y = 0, char peg = 'o', Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer)
         {
             switch (action)
@@ -93,7 +138,7 @@ namespace Battleship
 
         public static void DrawTopMargin()
         {
-            int TopOfGameBoard = (CONSOLE_HEIGHT / IN_HALF) - (BOARD_HEIGHT / IN_HALF);
+            int TopOfGameBoard = (Console.WindowHeight / IN_HALF) - (BOARD_HEIGHT / IN_HALF);
             for(int i = 0; i < TopOfGameBoard; ++i)
             {
                 Console.Write("\n");
@@ -101,7 +146,7 @@ namespace Battleship
         }
         public static void DrawLeftMargin()
         {
-            int LeftOfGameBoard = (CONSOLE_WIDTH / IN_HALF) - (BOARD_WIDTH / IN_HALF);
+            int LeftOfGameBoard = (Console.WindowWidth / IN_HALF) - (BOARD_WIDTH / IN_HALF);
             for (int i = 0; i < LeftOfGameBoard; ++i)
             {
                 Console.Write(" ");
