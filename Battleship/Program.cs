@@ -94,7 +94,7 @@ namespace Battleship
                 MainMenu();
             }
         }
-        public static void Board(Actions action, char[] board, int x = 0, int y = 0, char peg = 'o', Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer)
+        public static void Board(Actions action, char[] board, int x = 0, int y = 0, Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer)
         {
             switch (action)
             {
@@ -131,7 +131,7 @@ namespace Battleship
                     switch (orientation)
                     {
                         case Orientation.Horizontal:
-                            if (x + (int)ship < BOARD_WIDTH && y < BOARD_HEIGHT)
+                            if (x + (int)ship < BOARD_WIDTH && x >= 0 && y < BOARD_HEIGHT && y >= 0)
                             {
                                 for (int i = 0; i < (int)ship; ++i)
                                 {
@@ -157,7 +157,7 @@ namespace Battleship
                             }
                             break;
                         case Orientation.Vertical:
-                            if (y + (int)ship < BOARD_HEIGHT && x < BOARD_WIDTH)
+                            if (y + (int)ship < BOARD_HEIGHT && y >= 0 && x < BOARD_WIDTH && x >= 0)
                             {
                                 for (int i = 0; i < (int)ship; ++i)
                                 {
@@ -185,7 +185,23 @@ namespace Battleship
                     }
                     break;
                 case Actions.SetPeg:
-                    board[x + y * BOARD_HEIGHT] = peg;
+                    if (x < BOARD_WIDTH && x >= 0 & y < BOARD_HEIGHT && y >= 0)
+                    {
+                        if (board[x + y * BOARD_HEIGHT] == '+')
+                        {
+                            board[x + y * BOARD_HEIGHT] = 'h';
+                            Board(Actions.Show, gameBoard);
+                            Console.Write("HIT!!");
+                            Console.ReadKey();
+                        }
+                        if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOLE)
+                        {
+                            board[x + y * BOARD_HEIGHT] = 'm';
+                            Board(Actions.Show, gameBoard);
+                            Console.Write("Miss");
+                            Console.ReadKey();
+                        }
+                    }
                     break;
             }
         }
