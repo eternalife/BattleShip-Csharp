@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Battleship
 {
@@ -12,18 +13,50 @@ namespace Battleship
         public const int BOARD_WIDTH = 10;
         public const int BOARD_HEIGHT = 10;
         public const int BOARD_SIZE = 100;
-        public const int BOARD_EMPTY_SYMBOLE = 4;
+        public const int BOARD_EMPTY_SYMBOL = 4;
+
+        public const char HIT_SYMBOL = 'h';
+        public const char MISS_SYMBOL = 'm';
+
+        public const char AIRCRAFT_CARRIER_SYMBOL = 'A';
+        public const char BATTLESHIP_SYMBOL = 'B';
+        public const char CRUISER_SYMBOL = 'C';
+        public const char DESTROYER_SYMBOL = 'D';
+        public const char SUBMARINE_SYMBOL = 'S';
+
+        public const int AIRCRAFT_CARRIER_LENGTH = 5;
+        public const int BATTLESHIP_LENGTH = 4;
+        public const int CRUISER_LENGTH = 3;
+        public const int DESTROYER_LENGTH = 2;
+        public const int SUBMARINE_LENGTH = 3;
+
+        public static Dictionary<char, string> SHIP_NAMES = new Dictionary<char, string>{
+            { AIRCRAFT_CARRIER_SYMBOL, "Aircraft-Carrier" },
+            { BATTLESHIP_SYMBOL, "Battleship" },
+            { CRUISER_SYMBOL, "Cruiser" },
+            { DESTROYER_SYMBOL, "Destroyer" },
+            { SUBMARINE_SYMBOL, "Submarine" },
+        };
+
+        public static Dictionary<char, int> SHIP_HIT_COUNT = new Dictionary<char, int>{
+            { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
+            { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
+            { CRUISER_SYMBOL, CRUISER_LENGTH },
+            { DESTROYER_SYMBOL, DESTROYER_LENGTH },
+            { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
+        };
+
         public static char[] gameBoard = new char[BOARD_SIZE];
         //x = Hit peg
         //o = Miss Peg
         //+ = Ship section
         public enum Ships
         {
-            Destroyer = 2,
-            Submarine = 3,
-            Cruiser = 3,
-            BattleShip = 4,
-            Carrier = 5
+            Destroyer,
+            Submarine,
+            Cruiser,
+            BattleShip,
+            Aircraft_Carrier
         };
         public enum Actions
         {
@@ -111,7 +144,7 @@ namespace Battleship
                         switch (action)
                         {
                             case Actions.Initialize:
-                                board[i] = (char)BOARD_EMPTY_SYMBOLE;
+                                board[i] = (char)BOARD_EMPTY_SYMBOL;
                                 break;
                             case Actions.Show:
                                 Console.Write(board[i]);
@@ -133,9 +166,9 @@ namespace Battleship
                         case Orientation.Horizontal:
                             if (x + (int)ship < BOARD_WIDTH && x >= 0 && y < BOARD_HEIGHT && y >= 0)
                             {
-                                for (int i = 0; i < (int)ship; ++i)
+                                for (int i = 0; i < SelectPiece(ship).Key; ++i)
                                 {
-                                    if (board[(x + i) + y * BOARD_HEIGHT] == '+')
+                                    if (board[(x + i) + y * BOARD_HEIGHT] != (char)BOARD_EMPTY_SYMBOL)
                                     {
                                         setpiece = false;
                                         Console.Write("Sorry can't set it there.\n");
@@ -144,9 +177,10 @@ namespace Battleship
                                 }
                                 if (setpiece)
                                 {
-                                    for (int i = 0; i < (int)ship; ++i)
+                                    
+                                    for (int i = 0; i < SelectPiece(ship).Key; ++i)
                                     {
-                                        board[(x + i) + y * BOARD_HEIGHT] = '+';
+                                        board[(x + i) + y * BOARD_HEIGHT] = SelectPiece(ship).Value;
                                     }
                                 }
                             }
@@ -159,9 +193,9 @@ namespace Battleship
                         case Orientation.Vertical:
                             if (y + (int)ship < BOARD_HEIGHT && y >= 0 && x < BOARD_WIDTH && x >= 0)
                             {
-                                for (int i = 0; i < (int)ship; ++i)
+                                for (int i = 0; i < SelectPiece(ship).Key; ++i)
                                 {
-                                    if (board[x + (y + i) * BOARD_HEIGHT] == '+')
+                                    if (board[x + (y + i) * BOARD_HEIGHT] != (char)BOARD_EMPTY_SYMBOL)
                                     {
                                         setpiece = false;
                                         Console.Write("Sorry can't set it there.\n");
@@ -170,9 +204,9 @@ namespace Battleship
                                 }
                                 if (setpiece)
                                 {
-                                    for (int i = 0; i < (int)ship; ++i)
+                                    for (int i = 0; i < SelectPiece(ship).Key; ++i)
                                     {
-                                        board[x + (y + i) * BOARD_HEIGHT] = '+';
+                                        board[x + (y + i) * BOARD_HEIGHT] = SelectPiece(ship).Value;
                                     }
                                 }
                             }
@@ -187,14 +221,30 @@ namespace Battleship
                 case Actions.SetPeg:
                     if (x < BOARD_WIDTH && x >= 0 & y < BOARD_HEIGHT && y >= 0)
                     {
-                        if (board[x + y * BOARD_HEIGHT] == '+')
+                        if(board[x + y * BOARD_HEIGHT] == HIT_SYMBOL || board[x + y * BOARD_HEIGHT] == MISS_SYMBOL)
                         {
-                            board[x + y * BOARD_HEIGHT] = 'h';
-                            Board(Actions.Show, gameBoard);
-                            Console.Write("HIT!!");
+                            Console.Write("Sorry can't set it there.\n");
                             Console.ReadKey();
                         }
-                        if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOLE)
+                        else if (board[x + y * BOARD_HEIGHT] != (char)BOARD_EMPTY_SYMBOL)
+                        {
+                            string shipname = SHIP_NAMES[board[x + y * BOARD_HEIGHT]];
+                            //update hit count
+                            SHIP_HIT_COUNT[board[x + y * BOARD_HEIGHT]]--;
+
+                            Board(Actions.Show, gameBoard);
+
+                            Console.Write("HIT!! " + shipname);
+                            if (SHIP_HIT_COUNT[board[x + y * BOARD_HEIGHT]] == 0)
+                            {
+                                Console.Write(" and SUNK IT!!");
+                            }
+
+                            board[x + y * BOARD_HEIGHT] = HIT_SYMBOL;
+
+                            Console.ReadKey();
+                        }
+                        if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOL)
                         {
                             board[x + y * BOARD_HEIGHT] = 'm';
                             Board(Actions.Show, gameBoard);
@@ -202,10 +252,31 @@ namespace Battleship
                             Console.ReadKey();
                         }
                     }
+                    else
+                    {
+                        Console.Write("Sorry can't set it there.\n");
+                        Console.ReadKey();
+                    }
                     break;
             }
         }
-
+        public static KeyValuePair<int,char> SelectPiece(Ships ship)
+        {
+            switch(ship)
+            {
+                case Ships.BattleShip:
+                    return new KeyValuePair <int,char>(BATTLESHIP_LENGTH, BATTLESHIP_SYMBOL);
+                case Ships.Aircraft_Carrier:
+                    return new KeyValuePair<int, char>(AIRCRAFT_CARRIER_LENGTH, AIRCRAFT_CARRIER_SYMBOL);
+                case Ships.Cruiser:
+                    return new KeyValuePair<int, char>(CRUISER_LENGTH, CRUISER_SYMBOL);
+                case Ships.Destroyer:
+                    return new KeyValuePair<int, char>(DESTROYER_LENGTH, DESTROYER_SYMBOL);
+                case Ships.Submarine:
+                    return new KeyValuePair<int, char>(SUBMARINE_LENGTH, SUBMARINE_SYMBOL);
+            }
+            return new KeyValuePair<int, char>(0, '\0');
+        }
         public static void DrawTopMargin()
         {
             int TopOfGameBoard = (Console.WindowHeight / IN_HALF) - (BOARD_HEIGHT / IN_HALF);
