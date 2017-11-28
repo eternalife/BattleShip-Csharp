@@ -10,6 +10,10 @@ namespace Battleship
             
             MainMenu();
         }
+
+        public static char[] playerBoard = new char[BOARD_SIZE];
+        public static char[] computerBoard = new char[BOARD_SIZE];
+
         public const int IN_HALF = 2;
         public const int BOARD_WIDTH = 10;
         public const int BOARD_HEIGHT = 10;
@@ -40,6 +44,14 @@ namespace Battleship
             { SUBMARINE_SYMBOL, "Submarine" },
         };
 
+        public static Dictionary<char, ConsoleColor> SHIP_COLORS = new Dictionary<char, ConsoleColor>{
+            { AIRCRAFT_CARRIER_SYMBOL, ConsoleColor.Yellow },
+            { BATTLESHIP_SYMBOL, ConsoleColor.Red },
+            { CRUISER_SYMBOL, ConsoleColor.Magenta },
+            { DESTROYER_SYMBOL, ConsoleColor.Blue },
+            { SUBMARINE_SYMBOL, ConsoleColor.Green },
+        };
+
         public static Dictionary<char, int> SHIP_HIT_COUNT = new Dictionary<char, int>{
             { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
             { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
@@ -47,11 +59,7 @@ namespace Battleship
             { DESTROYER_SYMBOL, DESTROYER_LENGTH },
             { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
         };
-
-        public static char[] gameBoard = new char[BOARD_SIZE];
-        //x = Hit peg
-        //o = Miss Peg
-        //+ = Ship section
+        
         public enum Ships
         {
             Destroyer,
@@ -73,6 +81,7 @@ namespace Battleship
             Horizontal,
             Vertical
         };
+
         public static void MainMenu()
         {
             string input = null;
@@ -116,7 +125,7 @@ namespace Battleship
                     //    Console.Write("YES");
                     //}
                     //Console.ReadKey();
-                    Board(Actions.RandomizeShips, gameBoard);
+                    Board(Actions.RandomizeShips, playerBoard);
 
                     break;
                 case "2":
@@ -170,7 +179,13 @@ namespace Battleship
                                 board[i] = (char)BOARD_EMPTY_SYMBOL;
                                 break;
                             case Actions.Show:
+                                ConsoleColor originalColor = Console.ForegroundColor;
+                                if(SHIP_COLORS.ContainsKey(board[i]))
+                                {
+                                    Console.ForegroundColor = SHIP_COLORS[board[i]];
+                                }
                                 Console.Write(board[i]);
+                                Console.ForegroundColor = originalColor;
                                 if ((i + 1) % BOARD_WIDTH == 0)
                                 {
                                     Console.Write("\n");
@@ -275,7 +290,7 @@ namespace Battleship
                             //update hit count
                             SHIP_HIT_COUNT[board[x + y * BOARD_HEIGHT]]--;
 
-                            Board(Actions.Show, gameBoard);
+                            Board(Actions.Show, playerBoard);
 
                             Console.Write("HIT!! " + shipname);
                             if (SHIP_HIT_COUNT[board[x + y * BOARD_HEIGHT]] == 0)
@@ -290,7 +305,7 @@ namespace Battleship
                         if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOL)
                         {
                             board[x + y * BOARD_HEIGHT] = MISS_SYMBOL;
-                            Board(Actions.Show, gameBoard);
+                            Board(Actions.Show, playerBoard);
                             Console.Write("Miss");
                             Console.ReadKey();
                         }
@@ -306,7 +321,7 @@ namespace Battleship
                     break;
                 case Actions.RandomizeShips:
                     Random random = new Random();
-                    Board(Actions.Initialize, gameBoard);
+                    Board(Actions.Initialize, playerBoard);
                     for (int i = 0; i < NUMBER_OF_SHIPS; ++i)
                     {
                         int _x;
@@ -317,8 +332,8 @@ namespace Battleship
                             _x = random.Next(0, 9);
                             _y = random.Next(0, 9);
                             _orientation = random.Next(0, 2);
-                        } while (Board(Actions.SetPiece, gameBoard, _x, _y, (Orientation)_orientation, (Ships)i, false) == false);
-                        Board(Actions.Show, gameBoard);
+                        } while (Board(Actions.SetPiece, playerBoard, _x, _y, (Orientation)_orientation, (Ships)i, false) == false);
+                        Board(Actions.Show, playerBoard);
                     }
                     break;
             }
