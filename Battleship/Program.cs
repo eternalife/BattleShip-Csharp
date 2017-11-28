@@ -7,6 +7,7 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
+            
             MainMenu();
         }
         public const int IN_HALF = 2;
@@ -14,6 +15,7 @@ namespace Battleship
         public const int BOARD_HEIGHT = 10;
         public const int BOARD_SIZE = 100;
         public const int BOARD_EMPTY_SYMBOL = 4;
+        public const int NUMBER_OF_SHIPS = 5;
 
         public const char HIT_SYMBOL = 'h';
         public const char MISS_SYMBOL = 'm';
@@ -64,6 +66,7 @@ namespace Battleship
             Show,
             SetPiece,
             SetPeg,
+            RandomizeShips,
         };
         public enum Orientation
         {
@@ -105,6 +108,15 @@ namespace Battleship
             {
                 case "1":
                     Console.WriteLine("You selected option #1");
+                    //ConsoleKeyInfo ki = Console.ReadKey();
+                    //Console.Write(ki.KeyChar);
+                    //char c = ki.KeyChar;
+                    //if (c == '\u001b')
+                    //{
+                    //    Console.Write("YES");
+                    //}
+                    //Console.ReadKey();
+                    Board(Actions.RandomizeShips, gameBoard);
                     break;
                 case "2":
                     Console.WriteLine("You selected option #2");
@@ -127,7 +139,17 @@ namespace Battleship
                 MainMenu();
             }
         }
-        public static void Board(Actions action, char[] board, int x = 0, int y = 0, Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer)
+        /// <summary>
+        /// Provides the API for all the Board actions and functionality.
+        /// </summary>
+        /// <param name="action">Determines which action to take upon the board passed in.</param>
+        /// <param name="board">Board to take actions upon</param>
+        /// <param name="x">Horizontal coordinate of the board to take action upon.</param>
+        /// <param name="y">Vertical coordinate of the board to take action upon.</param>
+        /// <param name="orientation">If action passed is set to SetPiece the ship will be placed to passed orientation.</param>
+        /// <param name="ship">If action passed is set to SetPiece then the ship passed will be set to the board at location x, y and orientation passed in.</param>
+        /// <returns></returns>
+        public static bool Board(Actions action, char[] board, int x = 0, int y = 0, Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer, bool messageFlag = true)
         {
             switch (action)
             {
@@ -171,8 +193,12 @@ namespace Battleship
                                     if (board[(x + i) + y * BOARD_HEIGHT] != (char)BOARD_EMPTY_SYMBOL)
                                     {
                                         setpiece = false;
-                                        Console.Write("Sorry can't set it there.\n");
-                                        Console.ReadKey();
+                                        if (messageFlag)
+                                        {
+                                            Console.Write("Sorry can't set it there.\n");
+                                            Console.ReadKey();
+                                        }
+                                        return false;
                                     }
                                 }
                                 if (setpiece)
@@ -186,8 +212,12 @@ namespace Battleship
                             }
                             else
                             {
-                                Console.Write("Sorry can't set it there.\n");
-                                Console.ReadKey();
+                                if (messageFlag)
+                                {
+                                    Console.Write("Sorry can't set it there.\n");
+                                    Console.ReadKey();
+                                }
+                                return false;
                             }
                             break;
                         case Orientation.Vertical:
@@ -198,8 +228,12 @@ namespace Battleship
                                     if (board[x + (y + i) * BOARD_HEIGHT] != (char)BOARD_EMPTY_SYMBOL)
                                     {
                                         setpiece = false;
-                                        Console.Write("Sorry can't set it there.\n");
-                                        Console.ReadKey();
+                                        if (messageFlag)
+                                        {
+                                            Console.Write("Sorry can't set it there.\n");
+                                            Console.ReadKey();
+                                        }
+                                        return false;
                                     }
                                 }
                                 if (setpiece)
@@ -212,8 +246,12 @@ namespace Battleship
                             }
                             else
                             {
-                                Console.Write("Sorry can't set it there.\n");
-                                Console.ReadKey();
+                                if (messageFlag)
+                                {
+                                    Console.Write("Sorry can't set it there.\n");
+                                    Console.ReadKey();
+                                }
+                                return false;
                             }
                             break;
                     }
@@ -223,8 +261,12 @@ namespace Battleship
                     {
                         if(board[x + y * BOARD_HEIGHT] == HIT_SYMBOL || board[x + y * BOARD_HEIGHT] == MISS_SYMBOL)
                         {
-                            Console.Write("Sorry can't set it there.\n");
-                            Console.ReadKey();
+                            if (messageFlag)
+                            {
+                                Console.Write("Sorry can't set it there.\n");
+                                Console.ReadKey();
+                            }
+                            return false;
                         }
                         else if (board[x + y * BOARD_HEIGHT] != (char)BOARD_EMPTY_SYMBOL)
                         {
@@ -246,7 +288,7 @@ namespace Battleship
                         }
                         if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOL)
                         {
-                            board[x + y * BOARD_HEIGHT] = 'm';
+                            board[x + y * BOARD_HEIGHT] = MISS_SYMBOL;
                             Board(Actions.Show, gameBoard);
                             Console.Write("Miss");
                             Console.ReadKey();
@@ -254,12 +296,38 @@ namespace Battleship
                     }
                     else
                     {
-                        Console.Write("Sorry can't set it there.\n");
-                        Console.ReadKey();
+                        if (messageFlag)
+                        {
+                            Console.Write("Sorry can't set it there.\n");
+                            Console.ReadKey();
+                        }
+                    }
+                    break;
+                case Actions.RandomizeShips:
+                    Random random = new Random();
+                    Board(Actions.Initialize, gameBoard);
+                    for (int i = 0; i < NUMBER_OF_SHIPS; ++i)
+                    {
+                        int _x;
+                        int _y;
+                        int _orientation;
+                        do
+                        {
+                            _x = random.Next(0, 9);
+                            _y = random.Next(0, 9);
+                            _orientation = random.Next(0, 2);
+                        } while (Board(Actions.SetPiece, gameBoard, _x, _y, (Orientation)_orientation, (Ships)i, false) == false);
+                        Board(Actions.Show, gameBoard);
                     }
                     break;
             }
+            return true;
         }
+        /// <summary>
+        /// Method returns the Length and the Symbol of the ship value passed in.
+        /// </summary>
+        /// <param name="ship">One of the 5 ships</param>
+        /// <returns>integer lenght of ship and character symbol representing the ship</returns>
         public static KeyValuePair<int,char> SelectPiece(Ships ship)
         {
             switch(ship)
