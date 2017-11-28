@@ -117,6 +117,7 @@ namespace Battleship
                     //}
                     //Console.ReadKey();
                     Board(Actions.RandomizeShips, gameBoard);
+
                     break;
                 case "2":
                     Console.WriteLine("You selected option #2");
