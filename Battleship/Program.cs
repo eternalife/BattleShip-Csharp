@@ -7,7 +7,6 @@ namespace Battleship
     {
         static void Main(string[] args)
         {
-            
             MainMenu();
         }
 
@@ -60,30 +59,84 @@ namespace Battleship
             { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
         };
         
+        /// <summary>
+        /// Ship types
+        /// </summary>
         public enum Ships
         {
+            /// <summary>
+            /// A size 2 Destroyer ship
+            /// </summary>
             Destroyer,
+            /// <summary>
+            /// A size 3 Submarine ship
+            /// </summary>
             Submarine,
+            /// <summary>
+            /// A size 3 Cruiser ship
+            /// </summary>
             Cruiser,
+            /// <summary>
+            /// A size 4 BattleShip ship
+            /// </summary>
             BattleShip,
+            /// <summary>
+            /// A size 5 Aircraft_Carrier ship
+            /// </summary>
             Aircraft_Carrier
         };
+        /// <summary>
+        /// Board actions
+        /// </summary>
         public enum Actions
         {
+            /// <summary>
+            /// Initialize the board array passed in to ♦
+            /// </summary>
             Initialize,
+            /// <summary>
+            /// Displays a board array to the center of the screen
+            /// </summary>
             Show,
+            /// <summary>
+            /// Sets a specified ship type to a specified x and y location and orientation
+            /// </summary>
             SetShip,
+            /// <summary>
+            /// Sets a peg to specified x and y location displaying either a hit 'h' or miss 'm'
+            /// </summary>
             SetShot,
+            /// <summary>
+            /// Randomly places all ship types on a given board
+            /// </summary>
             RandomizeShips,
+            /// <summary>
+            /// Randomly places a specified ship type on a given board
+            /// </summary>
             RandomShip,
+            /// <summary>
+            /// Randomly places a peg on a given board
+            /// </summary>
             RandomShot,
         };
+        /// <summary>
+        /// Ship orientations
+        /// </summary>
         public enum Orientation
         {
+            /// <summary>
+            /// Align ship horizontally
+            /// </summary>
             Horizontal,
+            /// <summary>
+            /// Align ship vertically
+            /// </summary>
             Vertical
         };
-
+        /// <summary>
+        /// Provides a selection menu for the player to choose what type of game
+        /// they would like to play
+        /// </summary>
         public static void MainMenu()
         {
             string input = null;
@@ -376,6 +429,9 @@ namespace Battleship
             }
             return new KeyValuePair<int, char>(0, '\0');
         }
+        /// <summary>
+        /// Draws return characters to center the board vertically.
+        /// </summary>
         public static void DrawTopMargin()
         {
             int TopOfGameBoard = (Console.WindowHeight / IN_HALF) - (BOARD_HEIGHT / IN_HALF);
@@ -384,6 +440,9 @@ namespace Battleship
                 Console.Write("\n");
             }
         }
+        /// <summary>
+        /// Draws space characters to center the board horizontally
+        /// </summary>
         public static void DrawLeftMargin()
         {
             int LeftOfGameBoard = (Console.WindowWidth / IN_HALF) - (BOARD_WIDTH / IN_HALF);
