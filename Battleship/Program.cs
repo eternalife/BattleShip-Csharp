@@ -72,9 +72,11 @@ namespace Battleship
         {
             Initialize,
             Show,
-            SetPiece,
-            SetPeg,
+            SetShip,
+            SetShot,
             RandomizeShips,
+            RandomShip,
+            RandomShot,
         };
         public enum Orientation
         {
@@ -125,7 +127,6 @@ namespace Battleship
                     //    Console.Write("YES");
                     //}
                     //Console.ReadKey();
-                    Board(Actions.RandomizeShips, playerBoard);
 
                     break;
                 case "2":
@@ -161,6 +162,7 @@ namespace Battleship
         /// <returns></returns>
         public static bool Board(Actions action, char[] board, int x = 0, int y = 0, Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer, bool messageFlag = true)
         {
+            Random random = new Random();
             switch (action)
             {
                 case Actions.Initialize:
@@ -197,7 +199,7 @@ namespace Battleship
                         }
                     }
                     break;
-                case Actions.SetPiece:
+                case Actions.SetShip:
                     bool setpiece = true;
                     switch (orientation)
                     {
@@ -272,7 +274,7 @@ namespace Battleship
                             break;
                     }
                     break;
-                case Actions.SetPeg:
+                case Actions.SetShot:
                     if (x < BOARD_WIDTH && x >= 0 & y < BOARD_HEIGHT && y >= 0)
                     {
                         if(board[x + y * BOARD_HEIGHT] == HIT_SYMBOL || board[x + y * BOARD_HEIGHT] == MISS_SYMBOL)
@@ -320,21 +322,34 @@ namespace Battleship
                     }
                     break;
                 case Actions.RandomizeShips:
-                    Random random = new Random();
-                    Board(Actions.Initialize, playerBoard);
+                    random = new Random();
                     for (int i = 0; i < NUMBER_OF_SHIPS; ++i)
                     {
-                        int _x;
-                        int _y;
-                        int _orientation;
+                        int __x;
+                        int __y;
+                        int __orientation;
                         do
                         {
-                            _x = random.Next(0, 9);
-                            _y = random.Next(0, 9);
-                            _orientation = random.Next(0, 2);
-                        } while (Board(Actions.SetPiece, playerBoard, _x, _y, (Orientation)_orientation, (Ships)i, false) == false);
-                        Board(Actions.Show, playerBoard);
+                            __x = random.Next(0, BOARD_WIDTH);
+                            __y = random.Next(0, BOARD_HEIGHT);
+                            __orientation = random.Next(0, 2);
+                        } while (Board(Actions.SetShip, playerBoard, __x, __y, (Orientation)__orientation, (Ships)i, false) == false);
                     }
+                    break;
+                case Actions.RandomShip:
+                    int _x;
+                    int _y;
+                    int _orientation;
+                    do
+                    {
+                        _x = random.Next(0, BOARD_WIDTH);
+                        _y = random.Next(0, BOARD_HEIGHT);
+                        _orientation = random.Next(0, 2);
+                    } while (Board(Actions.SetShip, playerBoard, _x, _y, (Orientation)_orientation, ship, false) == false);
+                    break;
+                case Actions.RandomShot:
+                    random = new Random();
+                    Board(Actions.SetShot, playerBoard, random.Next(0, BOARD_WIDTH), random.Next(0, BOARD_HEIGHT));
                     break;
             }
             return true;
