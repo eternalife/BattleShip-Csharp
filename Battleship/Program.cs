@@ -11,6 +11,7 @@ namespace Battleship
         }
 
         public static char[] playerBoard = new char[BOARD_SIZE];
+        public static char[] playerShotBoard = new char[BOARD_SIZE];
         public static char[] computerBoard = new char[BOARD_SIZE];
 
         public const int IN_HALF = 2;
@@ -35,6 +36,28 @@ namespace Battleship
         public const int DESTROYER_LENGTH = 2;
         public const int SUBMARINE_LENGTH = 3;
 
+        //public class Ship_Attributes<_Name, _Color, _Length>
+        //{
+        //    public Ship_Attributes(_Name name, _Color color, _Length length)
+        //    {
+        //        Name = name;
+        //        Color = color;
+        //        Length = length;
+        //    }
+        //    public _Name Name { get; set; }
+        //    public _Color Color { get; set; }
+        //    public _Length Length { get; set; }
+        //}
+        //public static Dictionary<char, Ship_Attributes<string, ConsoleColor, int>> SHIP_ATTRIBUTES =
+        //    new Dictionary<char, Ship_Attributes<string, ConsoleColor, int>>
+        //    {
+        //        {AIRCRAFT_CARRIER_SYMBOL,   new Ship_Attributes<string, ConsoleColor, int>("Aircraft-Carrier",  ConsoleColor.Yellow,    5) },
+        //        {BATTLESHIP_SYMBOL,         new Ship_Attributes<string, ConsoleColor, int>("Battleship",        ConsoleColor.Red,       4) },
+        //        {CRUISER_SYMBOL,            new Ship_Attributes<string, ConsoleColor, int>("Cruiser",           ConsoleColor.Magenta,   3) },
+        //        {DESTROYER_SYMBOL,          new Ship_Attributes<string, ConsoleColor, int>("Destoryer",         ConsoleColor.Blue,      2) },
+        //        {SUBMARINE_SYMBOL,          new Ship_Attributes<string, ConsoleColor, int>("Submarine",         ConsoleColor.Green,     3) },
+        //    };
+
         public static Dictionary<char, string> SHIP_NAMES = new Dictionary<char, string>{
             { AIRCRAFT_CARRIER_SYMBOL, "Aircraft-Carrier" },
             { BATTLESHIP_SYMBOL, "Battleship" },
@@ -51,14 +74,35 @@ namespace Battleship
             { SUBMARINE_SYMBOL, ConsoleColor.Green },
         };
 
-        public static Dictionary<char, int> SHIP_HIT_COUNT = new Dictionary<char, int>{
+        public static Dictionary<int, int> SHIP_LENGTHS = new Dictionary<int, int>{
+            { 4, AIRCRAFT_CARRIER_LENGTH },
+            { 3, BATTLESHIP_LENGTH },
+            { 2, CRUISER_LENGTH },
+            { 0, DESTROYER_LENGTH },
+            { 1, SUBMARINE_LENGTH },
+        };
+
+        public static Dictionary<char, int> SHIP_HIT_COUNT_PLAYER = new Dictionary<char, int>{
             { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
             { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
             { CRUISER_SYMBOL, CRUISER_LENGTH },
             { DESTROYER_SYMBOL, DESTROYER_LENGTH },
             { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
         };
-        
+
+        public static Dictionary<char, int> SHIP_HIT_COUNT_COMPUTER = new Dictionary<char, int>{
+            { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
+            { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
+            { CRUISER_SYMBOL, CRUISER_LENGTH },
+            { DESTROYER_SYMBOL, DESTROYER_LENGTH },
+            { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
+        };
+
+        public enum PlayerType
+        {
+            Player,
+            Computer,
+        };
         /// <summary>
         /// Ship types
         /// </summary>
@@ -191,6 +235,20 @@ namespace Battleship
                 case "4":
                     Console.WriteLine("You selected option #4");
                     Console.ReadKey();
+                    SHIP_HIT_COUNT_COMPUTER = new Dictionary<char, int>{
+                        { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
+                        { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
+                        { CRUISER_SYMBOL, CRUISER_LENGTH },
+                        { DESTROYER_SYMBOL, DESTROYER_LENGTH },
+                        { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
+                    };
+                    SHIP_HIT_COUNT_PLAYER = new Dictionary<char, int>{
+                        { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
+                        { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
+                        { CRUISER_SYMBOL, CRUISER_LENGTH },
+                        { DESTROYER_SYMBOL, DESTROYER_LENGTH },
+                        { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
+                    };
                     Tests t = new Tests();
                     break;
                 case "5":
@@ -203,6 +261,11 @@ namespace Battleship
                 MainMenu();
             }
         }
+
+        public static void RandomComputer()
+        {
+
+        }
         /// <summary>
         /// Provides the API for all the Board actions and functionality.
         /// </summary>
@@ -213,7 +276,7 @@ namespace Battleship
         /// <param name="orientation">If action passed is set to SetPiece the ship will be placed to passed orientation.</param>
         /// <param name="ship">If action passed is set to SetPiece then the ship passed will be set to the board at location x, y and orientation passed in.</param>
         /// <returns></returns>
-        public static bool Board(Actions action, char[] board, int x = 0, int y = 0, Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer, bool messageFlag = true)
+        public static bool Board(Actions action, char[] board, int x = 0, int y = 0, Orientation orientation = Orientation.Horizontal, Ships ship = Ships.Destroyer, bool messageFlag = true, PlayerType player = PlayerType.Player)
         {
             Random random = new Random();
             switch (action)
@@ -257,7 +320,7 @@ namespace Battleship
                     switch (orientation)
                     {
                         case Orientation.Horizontal:
-                            if (x + (int)ship < BOARD_WIDTH && x >= 0 && y < BOARD_HEIGHT && y >= 0)
+                            if (x + SelectPiece(ship).Key < BOARD_WIDTH && x >= 0 && y < BOARD_HEIGHT && y >= 0)
                             {
                                 for (int i = 0; i < SelectPiece(ship).Key; ++i)
                                 {
@@ -292,7 +355,7 @@ namespace Battleship
                             }
                             break;
                         case Orientation.Vertical:
-                            if (y + (int)ship < BOARD_HEIGHT && y >= 0 && x < BOARD_WIDTH && x >= 0)
+                            if (y + SelectPiece(ship).Key < BOARD_HEIGHT && y >= 0 && x < BOARD_WIDTH && x >= 0)
                             {
                                 for (int i = 0; i < SelectPiece(ship).Key; ++i)
                                 {
@@ -343,15 +406,36 @@ namespace Battleship
                         {
                             string shipname = SHIP_NAMES[board[x + y * BOARD_HEIGHT]];
                             //update hit count
-                            SHIP_HIT_COUNT[board[x + y * BOARD_HEIGHT]]--;
-
-                            Board(Actions.Show, playerBoard);
-
-                            Console.Write("HIT!! " + shipname);
-                            if (SHIP_HIT_COUNT[board[x + y * BOARD_HEIGHT]] == 0)
+                            switch(player)
                             {
-                                Console.Write(" and SUNK IT!!");
+                                case PlayerType.Player:
+                                    SHIP_HIT_COUNT_PLAYER[board[x + y * BOARD_HEIGHT]]--;
+                                    break;
+                                case PlayerType.Computer:
+                                    SHIP_HIT_COUNT_COMPUTER[board[x + y * BOARD_HEIGHT]]--;
+                                    break;
                             }
+
+                            Board(Actions.Show, board);
+
+                            switch (player)
+                            {
+                                case PlayerType.Player:
+                                    Console.Write("HIT!! Player's " + shipname);
+                                    if (SHIP_HIT_COUNT_PLAYER[board[x + y * BOARD_HEIGHT]] == 0)
+                                    {
+                                        Console.Write(" and SUNK IT!!");
+                                    }
+                                    break;
+                                case PlayerType.Computer:
+                                    Console.Write("HIT!! Computer's" + shipname);
+                                    if (SHIP_HIT_COUNT_COMPUTER[board[x + y * BOARD_HEIGHT]] == 0)
+                                    {
+                                        Console.Write(" and SUNK IT!!");
+                                    }
+                                    break;
+                            }
+                            
 
                             board[x + y * BOARD_HEIGHT] = HIT_SYMBOL;
 
@@ -360,7 +444,7 @@ namespace Battleship
                         if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOL)
                         {
                             board[x + y * BOARD_HEIGHT] = MISS_SYMBOL;
-                            Board(Actions.Show, playerBoard);
+                            Board(Actions.Show, board);
                             Console.Write("Miss");
                             Console.ReadKey();
                         }
