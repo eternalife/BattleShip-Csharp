@@ -283,11 +283,13 @@ namespace Battleship
             {
                 case Actions.Initialize:
                 case Actions.Show:
+                    int row = 0;
                     if (action == Actions.Show)
                     {
                         Console.Clear();
                         DrawTopMargin();
                         DrawLeftMargin();
+                        Console.Write(row++);
                     }
                     for (int i = 0; i < BOARD_SIZE; ++i)
                     {
@@ -306,8 +308,11 @@ namespace Battleship
                                 Console.ForegroundColor = originalColor;
                                 if ((i + 1) % BOARD_WIDTH == 0)
                                 {
+                                    
                                     Console.Write("\n");
                                     DrawLeftMargin();
+                                    if(row < 10)
+                                    Console.Write(row++);
                                 }
                                 break;
                             default:
@@ -519,10 +524,20 @@ namespace Battleship
         public static void DrawTopMargin()
         {
             int TopOfGameBoard = (Console.WindowHeight / IN_HALF) - (BOARD_HEIGHT / IN_HALF);
-            for(int i = 0; i < TopOfGameBoard; ++i)
+            for(int i = 0; i < TopOfGameBoard - 1; ++i)
             {
                 Console.Write("\n");
             }
+            int LeftOfGameBoard = (Console.WindowWidth / IN_HALF) - (BOARD_WIDTH / IN_HALF);
+            for (int i = 0; i < LeftOfGameBoard; ++i)
+            {
+                Console.Write(" ");
+            }
+            for (int i = 0; i < 10; ++i)
+            {
+                Console.Write(i);
+            }
+            Console.Write("\n");
         }
         /// <summary>
         /// Draws space characters to center the board horizontally
@@ -530,7 +545,7 @@ namespace Battleship
         public static void DrawLeftMargin()
         {
             int LeftOfGameBoard = (Console.WindowWidth / IN_HALF) - (BOARD_WIDTH / IN_HALF);
-            for (int i = 0; i < LeftOfGameBoard; ++i)
+            for (int i = 0; i < LeftOfGameBoard - 1; ++i)
             {
                 Console.Write(" ");
             }
