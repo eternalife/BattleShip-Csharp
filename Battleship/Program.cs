@@ -91,11 +91,27 @@ namespace Battleship
         };
 
         public static Dictionary<char, int> SHIP_HIT_COUNT_COMPUTER = new Dictionary<char, int>{
-            { AIRCRAFT_CARRIER_SYMBOL, AIRCRAFT_CARRIER_LENGTH },
-            { BATTLESHIP_SYMBOL, BATTLESHIP_LENGTH },
-            { CRUISER_SYMBOL, CRUISER_LENGTH },
-            { DESTROYER_SYMBOL, DESTROYER_LENGTH },
-            { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
+            { AIRCRAFT_CARRIER_SYMBOL,  AIRCRAFT_CARRIER_LENGTH },
+            { BATTLESHIP_SYMBOL,        BATTLESHIP_LENGTH },
+            { CRUISER_SYMBOL,           CRUISER_LENGTH },
+            { DESTROYER_SYMBOL,         DESTROYER_LENGTH },
+            { SUBMARINE_SYMBOL,         SUBMARINE_LENGTH },
+        };
+
+        public static Dictionary<char, bool> SHIP_PLACED_PLAYER = new Dictionary<char, bool>{
+            { AIRCRAFT_CARRIER_SYMBOL,  false },
+            { BATTLESHIP_SYMBOL,        false },
+            { CRUISER_SYMBOL,           false },
+            { DESTROYER_SYMBOL,         false },
+            { SUBMARINE_SYMBOL,         false },
+        };
+
+        public static Dictionary<char, bool> SHIP_PLACED_COMPUTER = new Dictionary<char, bool>{
+            { AIRCRAFT_CARRIER_SYMBOL,  false },
+            { BATTLESHIP_SYMBOL,        false },
+            { CRUISER_SYMBOL,           false },
+            { DESTROYER_SYMBOL,         false },
+            { SUBMARINE_SYMBOL,         false },
         };
 
         public enum PlayerType
@@ -162,6 +178,11 @@ namespace Battleship
             /// Randomly places a peg on a given board
             /// </summary>
             RandomShot,
+            /// <summary>
+            /// Returns whether passed in PlayerType has any more ships alive or not. 
+            /// Still a ship alive returns true, no ships alive returns false.
+            /// </summary>
+            WinCondition,
         };
         /// <summary>
         /// Ship orientations
@@ -249,23 +270,33 @@ namespace Battleship
                         { DESTROYER_SYMBOL, DESTROYER_LENGTH },
                         { SUBMARINE_SYMBOL, SUBMARINE_LENGTH },
                     };
+                    SHIP_PLACED_PLAYER = new Dictionary<char, bool>{
+                        { AIRCRAFT_CARRIER_SYMBOL,  false },
+                        { BATTLESHIP_SYMBOL,        false },
+                        { CRUISER_SYMBOL,           false },
+                        { DESTROYER_SYMBOL,         false },
+                        { SUBMARINE_SYMBOL,         false },
+                    };
+                    SHIP_PLACED_COMPUTER = new Dictionary<char, bool>{
+                        { AIRCRAFT_CARRIER_SYMBOL,  false },
+                        { BATTLESHIP_SYMBOL,        false },
+                        { CRUISER_SYMBOL,           false },
+                        { DESTROYER_SYMBOL,         false },
+                        { SUBMARINE_SYMBOL,         false },
+                    };
                     Tests t = new Tests();
                     break;
                 case "5":
                     exit = true;
                     break;
             }
-            if(!exit)
+            if (!exit)
             {
                 Console.ReadKey();
                 MainMenu();
             }
         }
 
-        public static void RandomComputer()
-        {
-
-        }
         /// <summary>
         /// Provides the API for all the Board actions and functionality.
         /// </summary>
@@ -342,11 +373,45 @@ namespace Battleship
                                 }
                                 if (setpiece)
                                 {
-                                    
-                                    for (int i = 0; i < SelectPiece(ship).Key; ++i)
+                                    switch(player)
                                     {
-                                        board[(x + i) + y * BOARD_HEIGHT] = SelectPiece(ship).Value;
-                                    }
+                                        case PlayerType.Player:
+                                            if (!SHIP_PLACED_PLAYER[SelectPiece(ship).Value])
+                                            {
+                                                for (int i = 0; i < SelectPiece(ship).Key; ++i)
+                                                {
+                                                    board[(x + i) + y * BOARD_WIDTH] = SelectPiece(ship).Value;
+                                                }
+                                                if (player == PlayerType.Player)
+                                                {
+                                                    SHIP_PLACED_PLAYER[SelectPiece(ship).Value] = true;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Console.Write("Ship already placed.\n");
+                                                Console.ReadKey();
+                                            }
+                                            break;
+                                        case PlayerType.Computer:
+                                            if (!SHIP_PLACED_COMPUTER[SelectPiece(ship).Value])
+                                            {
+                                                for (int i = 0; i < SelectPiece(ship).Key; ++i)
+                                                {
+                                                    board[(x + i) + y * BOARD_WIDTH] = SelectPiece(ship).Value;
+                                                }
+                                                if (player == PlayerType.Player)
+                                                {
+                                                    SHIP_PLACED_COMPUTER[SelectPiece(ship).Value] = true;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Console.Write("Ship already placed.\n");
+                                                Console.ReadKey();
+                                            }
+                                            break;
+                                    } 
                                 }
                             }
                             else
@@ -377,9 +442,44 @@ namespace Battleship
                                 }
                                 if (setpiece)
                                 {
-                                    for (int i = 0; i < SelectPiece(ship).Key; ++i)
+                                    switch (player)
                                     {
-                                        board[x + (y + i) * BOARD_HEIGHT] = SelectPiece(ship).Value;
+                                        case PlayerType.Player:
+                                            if (!SHIP_PLACED_PLAYER[SelectPiece(ship).Value])
+                                            {
+                                                for (int i = 0; i < SelectPiece(ship).Key; ++i)
+                                                {
+                                                    board[x + (y + i) * BOARD_HEIGHT] = SelectPiece(ship).Value;
+                                                }
+                                                if (player == PlayerType.Player)
+                                                {
+                                                    SHIP_PLACED_PLAYER[SelectPiece(ship).Value] = true;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Console.Write("Ship already placed.\n");
+                                                Console.ReadKey();
+                                            }
+                                            break;
+                                        case PlayerType.Computer:
+                                            if (!SHIP_PLACED_COMPUTER[SelectPiece(ship).Value])
+                                            {
+                                                for (int i = 0; i < SelectPiece(ship).Key; ++i)
+                                                {
+                                                    board[x + (y + i) * BOARD_HEIGHT] = SelectPiece(ship).Value;
+                                                }
+                                                if (player == PlayerType.Player)
+                                                {
+                                                    SHIP_PLACED_COMPUTER[SelectPiece(ship).Value] = true;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Console.Write("Ship already placed.\n");
+                                                Console.ReadKey();
+                                            }
+                                            break;
                                     }
                                 }
                             }
@@ -445,6 +545,7 @@ namespace Battleship
                             board[x + y * BOARD_HEIGHT] = HIT_SYMBOL;
 
                             Console.ReadKey();
+                            return true;
                         }
                         if (board[x + y * BOARD_HEIGHT] == (char)BOARD_EMPTY_SYMBOL)
                         {
@@ -452,6 +553,7 @@ namespace Battleship
                             Board(Actions.Show, board);
                             Console.Write("Miss");
                             Console.ReadKey();
+                            return true;
                         }
                     }
                     else
@@ -475,7 +577,7 @@ namespace Battleship
                             __x = random.Next(0, BOARD_WIDTH);
                             __y = random.Next(0, BOARD_HEIGHT);
                             __orientation = random.Next(0, 2);
-                        } while (Board(Actions.SetShip, playerBoard, __x, __y, (Orientation)__orientation, (Ships)i, false) == false);
+                        } while (Board(Actions.SetShip, board, __x, __y, (Orientation)__orientation, (Ships)i, false, player) == false);
                     }
                     break;
                 case Actions.RandomShip:
@@ -487,11 +589,53 @@ namespace Battleship
                         _x = random.Next(0, BOARD_WIDTH);
                         _y = random.Next(0, BOARD_HEIGHT);
                         _orientation = random.Next(0, 2);
-                    } while (Board(Actions.SetShip, playerBoard, _x, _y, (Orientation)_orientation, ship, false) == false);
+                    } while (Board(Actions.SetShip, board, _x, _y, (Orientation)_orientation, ship, false, player) == false);
                     break;
                 case Actions.RandomShot:
-                    random = new Random();
-                    Board(Actions.SetShot, playerBoard, random.Next(0, BOARD_WIDTH), random.Next(0, BOARD_HEIGHT));
+                    bool hit = false;
+                    while (!hit)
+                    {
+                        random = new Random();
+                        hit = Board(Actions.SetShot, board, random.Next(0, BOARD_WIDTH), random.Next(0, BOARD_HEIGHT),messageFlag:false,player:player);
+                    }
+                    break;
+                case Actions.WinCondition:
+                    switch(player)
+                    {
+                        case PlayerType.Player:
+
+                            int summed_ship_counts = 0;
+                            foreach (var ship_hit_count in SHIP_HIT_COUNT_PLAYER)
+                            {
+                                summed_ship_counts += ship_hit_count.Value;
+                            }
+                            if (summed_ship_counts == 0)
+                            {
+                                Console.Write("Computer Wins!\n");
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                            break;
+                        case PlayerType.Computer:
+                            summed_ship_counts = 0;
+                            foreach(var ship_hit_count in SHIP_HIT_COUNT_COMPUTER)
+                            {
+                                summed_ship_counts += ship_hit_count.Value;
+                            }
+                            if (summed_ship_counts == 0)
+                            {
+                                Console.Write("Player Wins!\n");
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                            break;
+                    }
                     break;
             }
             return true;
@@ -519,7 +663,8 @@ namespace Battleship
             return new KeyValuePair<int, char>(0, '\0');
         }
         /// <summary>
-        /// Draws return characters to center the board vertically.
+        /// Draws new line characters "\n" to center the board vertically.
+        /// Adds numbering from 0-9 across the top of the board.
         /// </summary>
         public static void DrawTopMargin()
         {
@@ -540,7 +685,8 @@ namespace Battleship
             Console.Write("\n");
         }
         /// <summary>
-        /// Draws space characters to center the board horizontally
+        /// Draws space characters " " to center the board horizontally
+        /// Leaves a single space on the left for numbering the board horizontally
         /// </summary>
         public static void DrawLeftMargin()
         {
