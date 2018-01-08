@@ -533,7 +533,7 @@ namespace Battleship
                                     }
                                     break;
                                 case PlayerType.Computer:
-                                    Console.Write("HIT!! Computer's" + shipname);
+                                    Console.Write("HIT!! Computer's " + shipname);
                                     if (SHIP_HIT_COUNT_COMPUTER[board[x + y * BOARD_HEIGHT]] == 0)
                                     {
                                         Console.Write(" and SUNK IT!!");
